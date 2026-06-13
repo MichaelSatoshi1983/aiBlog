@@ -1,0 +1,15 @@
+<%- partial('partial/head') %>
+<body>
+  <%- partial('partial/header') %>
+  <main class="container">
+    <h1>Tag: <%= page.tag %></h1>
+    <% page.posts.each(function(post) { %>
+    <article class="post-card">
+      <h2><a href="<%- url_for(post.path) %>"><%= post.title %></a></h2>
+      <time><%= date(post.date) %></time>
+    </article>
+    <% }) %>
+  </main>
+  <%- partial('partial/footer') %>
+</body>
+</html>

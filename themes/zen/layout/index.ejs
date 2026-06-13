@@ -1,0 +1,25 @@
+<%- partial('partial/head') %>
+<body>
+  <%- partial('partial/header') %>
+  <main class="container">
+    <% page.posts.each(function(post) { %>
+    <article class="post-card">
+      <h2 class="post-title">
+        <a href="<%- url_for(post.path) %>"><%= post.title %></a>
+      </h2>
+      <div class="post-meta">
+        <time datetime="<%= date_xml(post.date) %>"><%= date(post.date) %></time>
+        <% if (post.tags && post.tags.length) { %>
+        <span class="tags">
+          <% post.tags.forEach(function(tag) { %>
+          <a href="<%- url_for(tag.path) %>" class="tag">#<%= tag.name %></a>
+          <% }) %>
+        </span>
+        <% } %>
+      </div>
+    </article>
+    <% }) %>
+  </main>
+  <%- partial('partial/footer') %>
+</body>
+</html>

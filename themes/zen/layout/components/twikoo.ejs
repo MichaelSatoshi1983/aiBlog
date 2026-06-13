@@ -1,0 +1,12 @@
+<% if (theme.twikoo && theme.twikoo.enable) { %>
+<div id="tcomment" class="comments"></div>
+<script src="/js/twikoo.all.min.js"></script>
+<script>
+twikoo.init({
+  envId: '<%= theme.twikoo.envId %>',
+  el: '#tcomment',
+  region: '<%= theme.twikoo.region %>',
+  lang: '<%= theme.twikoo.lang %>'
+});
+</script>
+<% } %>
