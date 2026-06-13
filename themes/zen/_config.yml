@@ -3,25 +3,22 @@ favicon: favicon.jpg
 menu:
   首页: /
   标签: /tags/
-  关于: about.html
+  关于: /about/
 
 copyright:
   name: AI Blog
 
-# twikoo comment system
 twikoo:
   enable: false
-  envId: your-env-id
+  envId : 您的环境id
   region: ap-guangzhou
   lang: zh-CN
 
-# beaudar comment system
 beaudar:
   enable: false
-  repo: mouyase/Yojigen.Tech
+  repo : mouyase/Yojigen.Tech
   branch: main
 
-# footer friends links
 friends:
   - name: GitHub
     url: https://github.com/MichaelSatoshi1983
