@@ -1,0 +1,27 @@
+favicon: favicon.jpg
+
+menu:
+  首页: /
+  标签: /tags/
+  关于: about.html
+
+copyright:
+  name: Yojigen.Tech
+
+# twikoo comment system
+twikoo:
+  enable: true
+  envId: your-env-id
+  region: ap-guangzhou
+  lang: zh-CN
+
+# beaudar comment system
+beaudar:
+  enable: true
+  repo: mouyase/Yojigen.Tech
+  branch: main
+
+# footer friends links
+friends:
+  - name: Example
+    url: https://www.example.com/
