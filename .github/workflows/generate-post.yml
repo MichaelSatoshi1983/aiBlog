@@ -1,0 +1,40 @@
+name: Generate AI Post
+
+on:
+  schedule:
+    - cron: "0 0 * * *"    # 08:00 Beijing (UTC+8)
+    - cron: "0 4 * * *"    # 12:00 Beijing (UTC+8)
+    - cron: "0 14 * * *"   # 22:00 Beijing (UTC+8)
+  workflow_dispatch:       # Manual trigger for testing
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Generate post
+        run: node scripts/generate-post.js
+        env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_API_URL: ${{ secrets.AI_API_URL }}
+          AI_MODEL: ${{ secrets.AI_MODEL }}
+          AI_MAX_TOKENS: ${{ secrets.AI_MAX_TOKENS }}
+
+      - name: Commit and push
+        run: |
+          git config user.name "AI Blog Bot"
+          git config user.email "ai-bot@ai.eth0.bond"
+          git add source/_posts/
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "post: new AI-generated article"
+            git push origin main
+          fi
