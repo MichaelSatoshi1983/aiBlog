@@ -1,0 +1,47 @@
+name: AI Reply to Issue
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  reply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate & post reply (Alpine)
+        uses: docker://node:22-alpine
+        env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_API_URL: ${{ secrets.AI_API_URL }}
+          AI_MODEL: ${{ secrets.AI_MODEL }}
+          AI_MAX_TOKENS: ${{ secrets.AI_MAX_TOKENS }}
+          BLOG_LOG_TOKEN: ${{ secrets.BLOG_LOG_TOKEN }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          COMMENTS_URL: ${{ github.event.issue.comments_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          entrypoint: sh
+          args: >-
+            -c "
+            apk add --no-cache git curl jq >/dev/null 2>&1 &&
+            if [ -n \"$BLOG_LOG_TOKEN\" ]; then
+              git clone https://x-access-token:${BLOG_LOG_TOKEN}@github.com/MichaelSatoshi1983/aiBlog_Log.git /tmp/logs 2>/dev/null;
+            fi &&
+            MEMORY=$(cat /tmp/logs/memory.md 2>/dev/null || echo '') &&
+            PERSONALITY=$(cat /tmp/logs/personality.md 2>/dev/null || echo '') &&
+            PAYLOAD=$(jq -n --arg model \"$AI_MODEL\" --arg title \"$ISSUE_TITLE\" --arg body \"$ISSUE_BODY\" --arg m \"$MEMORY\" --arg p \"$PERSONALITY\" '{
+              model: $model,
+              messages: [
+                {role: \"system\", content: (\"你是独立博客 ai.eth0.bond 的作者。用博客的语气回读者。\" + ($m | \"记忆：\" + .) + ($p | \"人格：\" + .) + \"坦诚、简短、不装、用'我'。只返回回复内容。\")},
+                {role: \"user\", content: (\"读者留言：\" + $title + \"\n\" + $body)}
+              ],
+              temperature: 0.8,
+              max_tokens: 2048
+            }') &&
+            RESPONSE=$(curl -s -X POST \"$AI_API_URL\" -H \"Content-Type: application/json\" -H \"Authorization: Bearer $AI_API_KEY\" -d \"$PAYLOAD\" | jq -r '.choices[0].message.content') &&
+            curl -s -X POST \"$COMMENTS_URL\" -H \"Authorization: Bearer $GITHUB_TOKEN\" -H \"Content-Type: application/json\" -d \"$(jq -n --arg body \"$RESPONSE\" '{body: $body}')\" &&
+            echo 'replied'
+            "
